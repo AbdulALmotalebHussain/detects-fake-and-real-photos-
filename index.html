@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>detects-fake-and-real-photos</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #333;
+        color: #ddd;
+        padding: 20px;
+        line-height: 1.6;
+    }
+    .container {
+        max-width: 800px;
+        margin: auto;
+    }
+    pre {
+        background-color: #444;
+        padding: 20px;
+        overflow: auto;
+    }
+    code {
+        color: #bb86fc;
+    }
+    h1, h2 {
+        color: #bb86fc;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Python Code Explanation</h1>
+    <p>This code uses TensorFlow and Keras to set up a VGG16 model for binary image classification. Here's what each part of the script does:</p>
+
+    <h2>Import Statements</h2>
+    <pre><code>from unittest import result
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Dense, Flatten, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.applications.vgg16 import preprocess_input</code></pre>
+
+    <p>These lines import necessary Python modules for data manipulation, deep learning operations (TensorFlow), image processing, and the VGG16 model architecture.</p>
+
+    <h2>Loading VGG16 Model</h2>
+    <pre><code>base_model = VGG16(weights='imagenet', include_top=False, input_shape=(224, 224, 3))</code></pre>
+
+    <p>Loads the VGG16 model pretrained on ImageNet data set without its top layer, setting the input shape for the images it will process.</p>
+
+    <h2>Freezing the Base Model Layers</h2>
+    <pre><code>for layer in base_model.layers:
+    layer.trainable = False</code></pre>
+
+    <p>This loop sets the layers of the VGG16 base model to be non-trainable, which means their weights will not update during training.</p>
+
+    <h2>Adding New Layers for Classification</h2>
+    <pre><code>x = Flatten()(base_model.output)
+x = Dense(512, activation='relu')(x)
+x = Dropout(0.5)(x)
+predictions = Dense(2, activation='softmax')(x)</code></pre>
+
+    <p>Flatten the output of the base model, add a Dense layer for feature interpretation, apply Dropout for regularization, and add a final Dense layer for classification with softmax activation for two classes.</p>
+
+    <h2>Creating the Final Model</h2>
+    <pre><code>model = Model(inputs=base_model.input, outputs=predictions)</code></pre>
+
+    <p>Creates a new model that takes the inputs of the base VGG16 model and outputs the predictions from the newly added layers.</p>
+
+    <h2>Compiling the Model</h2>
+    <pre><code>model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])</code></pre>
+
+    <p>Compile the model with the Adam optimizer and binary cross-entropy loss function, tracking the accuracy metric.</p>
+
+    <h2>Model Summary</h2>
+    <pre><code>model.summary()</code></pre>
+
+    <p>Prints a summary of the model, showing all layers and parameters.</p>
+
+    <h2>Loading and Preprocessing Image Function</h2>
+    <pre><code>def load_and_preprocess_image(img_path):
+    img = image.load_img(img_path, target_size=(224, 224))
+    img_array = image.img_to_array(img)
+    img_array_expanded_dims = np.expand_dims(img_array, axis=0)
+    return preprocess_input(img_array_expanded_dims)</code></pre>
+
+    <p>This function loads an image from the given path, resizes it, converts it to an array, adds an extra dimension (for batch size), and preprocesses it according to the requirements of the VGG16 model.</p>
+
+    <h2>Predicting Image Function</h2>
+    <pre><code>def predict_image(model, img_path):
+    processed_img = load_and_preprocess_image(img_path)
+    predictions = model.predict(processed_img)
+    return "Fake" if np.argmax(predictions) == 0 else "Real"</code></pre>
+
+    <p>This function takes the model and image path as input, preprocesses the image, and uses the model to predict the class of the image. It returns "Fake" if the predicted class is 0, otherwise "Real".</p>
+
+    <h2>Example Usage</h2>
+    <pre><code>img_path = '/path/to/your/image.jpg'
+print("The image is:", predict_image(model, img_path))</code></pre>
+
+    <p>The above hypothetical usage example assumes you have a trained model. It would print the prediction result for the specified image path.</p>
+</div>
+</body>
+</html>
